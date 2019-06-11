@@ -1,0 +1,162 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.w3.org/TR/xhtml11/">
+
+    <head>
+        <title>Home</title>
+
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" />
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+        <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"/>
+        <link th:href="@{/css/main.css}" type="text/css" rel="stylesheet" />
+    </head>
+
+    <body>
+
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary rounded">
+        <a class="navbar-brand" href="/home">KinoSearch</a>
+        <form th:action="@{/searchFilm}" th:field="${searchForm}" method="GET">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <input class="form-control" style="width: 520px;" type="text" name="q" placeholder="Search" aria-label="Search" />
+            </li>
+            <div class = "btn-group btn-group-toggle" data-toggle = "buttons">
+                <label class="btn btn-primary active">
+                    <input type="radio" name="options" id="option1" autocomplete="off" checked th:value="1"> By title
+                </label>
+                <label class="btn btn-primary">
+                    <input type="radio" name="options" id="option2" autocomplete="off" th:value="2"> By producer
+                </label>
+            </div>
+            <li class="nav-item active">
+                <input class="btn btn-success" type="submit" value="Search" />
+            </li>
+        </ul>
+        </form>
+
+        <ul class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <button type="button" onclick="window.location='/logout'" class="btn btn-danger">Выйти</button>
+            </li>
+        </ul>
+    </nav>
+
+
+    <h1 class="mt-4 text-center" th:text="#{greeting}"></h1>
+
+    <table class="col-md-7 mx-auto table table-hover">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Producer</th>
+            <th>Points</th>
+            <div sec:authorize="hasRole('ADMIN')">
+                <th>EDIT</th>
+            </div>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each ="film : ${filmPage.content}">
+            <div sec:authorize="hasRole('ADMIN')">
+                <td class = "idFilm" th:text="${film.id}">...</td>
+                <td><input class = "titleFilm" th:value="${film.title}"/></td>
+                <td><input class = "producerFilm" th:value="${film.producer}"/></td>
+                <td><input class = "pointsFilm" th:value="${film.points}"/></td>
+                <td class="answer"></td>
+                <td>
+                    <button type="button" class="fa fa-pencil" th:value="${film.id}"/>
+                    <button type="button" class="fa fa-trash-o fa-lg" th:value="${film.id}"/>
+                </td>
+            </div>
+            <div sec:authorize="hasRole('USER')">
+                <td th:utext="${film.id}">...</td>
+                <td th:utext="${film.title}">...</td>
+                <td th:utext="${film.producer}">...</td>
+                <td th:utext="${film.points}">...</td>
+            </div>
+        </tr>
+        </tbody>
+    </table>
+
+
+
+
+    <div sec:authorize="hasRole('ADMIN')">
+        <h2 class="mt-4 text-center">Добавить новый фильм на сайт</h2>
+        <form action="/addFilm" method="post">
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Title</span>
+            </div>
+            <input type="text" class="form-control" name="title" placeholder="Title" aria-label="Title" aria-describedby="basic-addon1">
+            <div class="input-group-prepend">
+                <span class="input-group-text" name="id">Producer</span>
+            </div>
+            <input type="text" class="form-control" name="producer" placeholder="Producer" aria-label="Producer" aria-describedby="basic-addon1">
+            <div class="input-group-prepend">
+                <span class="input-group-text" name="id">Points</span>
+            </div>
+            <input type="text" class="form-control" name="points" placeholder="Points" aria-label="Points" aria-describedby="basic-addon1">
+            <input class="btn btn-success" type="submit" value="Создать" />
+        </div>
+        </form>
+    </div>
+
+    <div class="row justify-content-center">
+<nav aria-label="Page navigation example">
+    <ul class="pagination">
+        <li class="page-item" th:classappend="${filmPage.number == 0} ? disabled">
+            <a class="page-link"  th:href="@{/home(size=${filmPage.size}, page=${filmPage.number})}">
+                ←
+            </a>
+        </li>
+
+        <li th:each="pageNumber : ${pageNumbers}" class="page-item" th:classappend="${pageNumber==filmPage.number + 1} ? active">
+            <a class="page-link" th:href="@{/home(size=${filmPage.size}, page=${pageNumber})}"
+               th:text="${pageNumber}">
+            </a>
+        </li>
+
+        <li class="page-item" th:classappend="${filmPage.number == filmPage.totalPages - 1} ? disabled">
+            <a class="page-link" th:href="@{/home(size=${filmPage.size}, page=${filmPage.number + 2})}">→</a>
+        </li>
+    </ul>
+</nav>
+    <select onchange="if (this.value) window.location.href = this.value" class="text-primary" id="select" style="height: 38px;">
+        <option value="/home?size=2" th:attrappend="selected=${filmPage.size == 2} ? selected">2</option>
+        <option value="/home?size=3" th:attrappend="selected=${filmPage.size == 3} ? selected">3</option>
+        <option value="/home?size=5" th:attrappend="selected=${filmPage.size == 5} ? selected">5</option>
+    </select>
+    </div>
+    </body>
+    <script type="text/javascript" th:src="@{/js/script.js}"></script>
+    <script>
+        $(document).ready(function () {
+    $(".fa-pencil").click(function() {
+            var $call = $(this);
+            $.ajax({
+                type: 'GET',
+                url: '/editFilm',
+                data: {
+                    'title': $call.closest('tr').find('.titleFilm').val(),
+                    'producer': $call.closest('tr').find('.producerFilm').val(),
+                    'points': $call.closest('tr').find('.pointsFilm').val(),
+                    'id': $call.val(),
+                }
+            }).done(
+                function (answer) {
+                    if (answer == true) {
+                        $call.closest('tr').find('.answer').html("Успех");
+                    }
+                }
+            )
+        })
+}
+)
+    </script>
+</html>

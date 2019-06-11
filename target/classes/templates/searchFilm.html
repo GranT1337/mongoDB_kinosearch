@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Search</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous" />
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary rounded">
+    <a class="navbar-brand" href="/home">KinoSearch</a>
+    <form th:action="@{/searchFilm}" th:field="${searchForm}" method="GET">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+                <input class="form-control" style="width: 520px;" type="text" name="q" placeholder="Search" aria-label="Search" />
+            </li>
+            <div class = "btn-group btn-group-toggle" data-toggle = "buttons">
+                <label class="btn btn-primary active">
+                    <input type="radio" name="options" id="option1" autocomplete="off" checked th:value="1"> By title
+                </label>
+                <label class="btn btn-primary">
+                    <input type="radio" name="options" id="option2" autocomplete="off" th:value="2"> By producer
+                </label>
+            </div>
+            <li class="nav-item active">
+                <input class="btn btn-success" type="submit" value="Search" />
+            </li>
+        </ul>
+    </form>
+
+    <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+            <button type="button" onclick="window.location='/logout'" class="btn btn-danger">Выйти</button>
+        </li>
+    </ul>
+</nav>
+
+<table class="col-md-7 mx-auto table table-hover">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Title</th>
+        <th>Producer</th>
+        <th>Points</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each ="film : ${filmList}">
+        <td th:utext="${film.id}">...</td>
+        <td th:utext="${film.title}">...</td>
+        <td th:utext="${film.producer}">...</td>
+        <td th:utext="${film.points}">...</td>
+    </tr>
+    </tbody>
+</table>
+<button type="button" onclick="window.location='/home'" class="btn btn-info">Вернуться на главную</button>
+</body>
+
+<style>
+    .navbar-nav {
+      flex-direction: row;
+    }
+
+    .nav-link {
+      padding-right: .5rem !important;
+      padding-left: .5rem !important;
+    }
+
+    .ml-auto .dropdown-menu {
+      left: auto !important;
+      right: 0px;
+    }
+</style>
+
+</html>
