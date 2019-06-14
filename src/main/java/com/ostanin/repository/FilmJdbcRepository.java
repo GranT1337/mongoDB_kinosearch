@@ -1,9 +1,12 @@
 package com.ostanin.repository;
 
 
+import com.mongodb.client.model.Accumulators;
+import com.mongodb.client.model.Aggregates;
 import com.ostanin.dto.Film;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.TextCriteria;
@@ -14,10 +17,16 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.group;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.match;
+import static org.springframework.data.mongodb.core.aggregation.Aggregation.sample;
+
 @Repository
-public class FilmJdbcRepository implements IFilmJdbcRepository{
+public class FilmJdbcRepository{
 
     @Autowired
     JdbcTemplate jdbcTemplate;
@@ -28,32 +37,28 @@ public class FilmJdbcRepository implements IFilmJdbcRepository{
     @Autowired
     private MongoTemplate mongoTemplate;
 
-    class FilmRowMapper implements RowMapper<Film> {
-        @Override
-        public Film mapRow(ResultSet resultSet, int i) throws SQLException {
-            Film film = new Film();
-            film.setId(resultSet.getLong("id"));
-            film.setTitle(resultSet.getString("title"));
-            film.setProducer(resultSet.getString("producer"));
-            film.setPoints(resultSet.getDouble("points"));
-            return film;
-        }
-    }
-
-    public void addFilm(Film film) {
-        String sql = "insert into film values( ? , ? , ? , ?)";
-        jdbcTemplate.update(sql, film.getId(), film.getTitle(), film.getProducer(), film.getPoints());
-    }
 
     public boolean refreshFilm(Film film) {
-        Query query = new Query();
-        query.addCriteria(Criteria.where("id").is(film.getId()));
-        Update update = new Update();
-        update.set("title", film.getTitle());
-        update.set("producer", film.getProducer());
-        update.set("points", film.getPoints());
-        mongoTemplate.updateMulti(query, update, Film.class);
+          filmRepository.save(film);
+//        Query query = new Query();
+//        query.addCriteria(Criteria.where("id").is(film.getId()));
+//        Update update = new Update();
+//        update.set("title", film.getTitle());
+//        update.set("producer", film.getProducer());
+//        update.set("points", film.getPoints());
+//        mongoTemplate.updateMulti(query, update, Film.class);
         return true;
+    }
+
+
+    public double getAvgPoints() {
+        double d = mongoTemplate.getDb().getCollection("film").aggregate(
+                Arrays.asList(
+                        Aggregates.group(null, Accumulators.avg("maxx", "$points"))
+                )
+        ).first().getDouble("maxx");
+        System.out.println(d);
+        return d;
     }
 
     public boolean deleteFilm(long id) {

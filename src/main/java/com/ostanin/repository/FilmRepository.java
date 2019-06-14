@@ -9,5 +9,10 @@ import java.util.List;
 @Repository
 public interface FilmRepository  extends MongoRepository<Film, Long> {
     List<Film> findByTitleLike(String title);
-    List<Film> findByProducer(String producer);
+    List<Film> findAllByOrderByPointsDesc();
+    void deleteById(Long id);
+    //List<Film> findByProducer(String producer);
+    List<Film> findByTitleOrId(String title, long id);
+    List<Film> findByTitle(String title);
+    List<Film> findByPointsGreaterThan(double number);
 }

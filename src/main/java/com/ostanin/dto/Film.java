@@ -17,7 +17,7 @@ public class Film {
     @NotEmpty(message="Название фильма должно быть задано")
     private String title;
     @NotEmpty(message="Режиссёр должен быть указан")
-    private String producer;
+    private Producer producers;
     @Pattern(regexp = "(\\d+.?,?\\d+)", message = "Неправильно указан балл")
-    private Double points;
+    private double points;
 }

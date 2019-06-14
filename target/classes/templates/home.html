@@ -44,8 +44,6 @@
             </li>
         </ul>
     </nav>
-
-
     <h1 class="mt-4 text-center" th:text="#{greeting}"></h1>
 
     <table class="col-md-7 mx-auto table table-hover">
@@ -61,11 +59,11 @@
         </tr>
         </thead>
         <tbody>
-        <tr th:each ="film : ${filmPage.content}">
+        <tr th:each ="film : ${ALL_FILMS}">
             <div sec:authorize="hasRole('ADMIN')">
                 <td class = "idFilm" th:text="${film.id}">...</td>
                 <td><input class = "titleFilm" th:value="${film.title}"/></td>
-                <td><input class = "producerFilm" th:value="${film.producer}"/></td>
+                <td><input class = "producerFilm" th:value="${film.producerName}"/></td>
                 <td><input class = "pointsFilm" th:value="${film.points}"/></td>
                 <td class="answer"></td>
                 <td>
@@ -76,7 +74,7 @@
             <div sec:authorize="hasRole('USER')">
                 <td th:utext="${film.id}">...</td>
                 <td th:utext="${film.title}">...</td>
-                <td th:utext="${film.producer}">...</td>
+                <td th:utext="${film.producerName}">...</td>
                 <td th:utext="${film.points}">...</td>
             </div>
         </tr>
@@ -106,37 +104,29 @@
         </div>
         </form>
     </div>
-
-    <div class="row justify-content-center">
-<nav aria-label="Page navigation example">
-    <ul class="pagination">
-        <li class="page-item" th:classappend="${filmPage.number == 0} ? disabled">
-            <a class="page-link"  th:href="@{/home(size=${filmPage.size}, page=${filmPage.number})}">
-                ←
-            </a>
-        </li>
-
-        <li th:each="pageNumber : ${pageNumbers}" class="page-item" th:classappend="${pageNumber==filmPage.number + 1} ? active">
-            <a class="page-link" th:href="@{/home(size=${filmPage.size}, page=${pageNumber})}"
-               th:text="${pageNumber}">
-            </a>
-        </li>
-
-        <li class="page-item" th:classappend="${filmPage.number == filmPage.totalPages - 1} ? disabled">
-            <a class="page-link" th:href="@{/home(size=${filmPage.size}, page=${filmPage.number + 2})}">→</a>
-        </li>
-    </ul>
-</nav>
-    <select onchange="if (this.value) window.location.href = this.value" class="text-primary" id="select" style="height: 38px;">
-        <option value="/home?size=2" th:attrappend="selected=${filmPage.size == 2} ? selected">2</option>
-        <option value="/home?size=3" th:attrappend="selected=${filmPage.size == 3} ? selected">3</option>
-        <option value="/home?size=5" th:attrappend="selected=${filmPage.size == 5} ? selected">5</option>
-    </select>
-    </div>
     </body>
     <script type="text/javascript" th:src="@{/js/script.js}"></script>
     <script>
-        $(document).ready(function () {
+  $(document).ready(function () {
+    $(".fa-trash-o").click(function() {
+            var $call = $(this);
+            $.ajax({
+                type: 'GET',
+                url: '/deleteFilm',
+                data: {
+                    'id': $call.val(),
+                }
+            }).done(
+                (answer) -> {
+                    if (answer == true) {
+                        $call.closest('tr').remove();
+                    }
+                }
+            )
+        })
+})
+
+$(document).ready(function () {
     $(".fa-pencil").click(function() {
             var $call = $(this);
             $.ajax({
@@ -158,5 +148,6 @@
         })
 }
 )
+
     </script>
 </html>
